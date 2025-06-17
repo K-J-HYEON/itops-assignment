@@ -44,16 +44,16 @@ func CreateIssueHandler(store data.IssueStore) http.HandlerFunc {
 			return
 		}
 
-		var assignedUser *models.User
+		var assignedUser *models.User // assignedUser는 *models.User 타입
 		initialStatus := "PENDING"
 
-		if req.UserID != nil && *req.UserID != 0 { // 프론트에서 0을 null 대신 보낼 경우 처리
-			user, ok := store.GetUserByID(*req.UserID)
+		if req.UserID != nil && *req.UserID != 0 {
+			user, ok := store.GetUserByID(*req.UserID) // GetUserByID는 이제 *models.User를 반환합니다.
 			if !ok {
 				handleError(w, fmt.Sprintf("존재하지 않는 사용자 ID입니다: %d", *req.UserID), http.StatusBadRequest)
 				return
 			}
-			assignedUser = &user
+			assignedUser = user // 'user'는 이미 *models.User 타입이므로, '&' 연산자를 제거합니다.
 			initialStatus = "IN_PROGRESS"
 		}
 
@@ -172,18 +172,18 @@ func UpdateIssueHandler(store data.IssueStore) http.HandlerFunc {
 		}
 
 		// 담당자 변경 로직
-		if req.UserID != nil { // 요청에 userId 필드가 포함된 경우 (null 또는 실제 ID)
-			if *req.UserID == 0 { // 프론트에서 0을 'null' 대신 보낼 경우 담당자 해제로 간주
+		if req.UserID != nil { // 요청에 userId 필드가 포함된 경우 (nil 또는 실제 ID)
+			if *req.UserID == 0 { // 프론트에서 0을 'nil' 대신 보낼 경우 담당자 해제로 간주
 				existingIssue.User = nil
 				// 백엔드 비즈니스 규칙: 담당자 제거 시 상태는 PENDING으로 변경
 				existingIssue.Status = "PENDING"
 			} else {
-				user, ok := store.GetUserByID(*req.UserID)
+				user, ok := store.GetUserByID(*req.UserID) // GetUserByID는 이제 *models.User를 반환합니다.
 				if !ok {
 					handleError(w, fmt.Sprintf("존재하지 않는 사용자 ID입니다: %d", *req.UserID), http.StatusBadRequest)
 					return
 				}
-				existingIssue.User = &user
+				existingIssue.User = user // 'user'는 이미 *models.User 타입이므로, '&' 연산자를 제거합니다.
 
 				// 백엔드 비즈니스 규칙: PENDING 상태에서 담당자 할당 시, 상태가 명시적으로 지정되지 않았다면 IN_PROGRESS로 변경
 				if existingIssue.Status == "PENDING" && req.Status == nil {

@@ -14,7 +14,7 @@ func main() {
 
 	router := mux.NewRouter()
 
-	// CORS 설정:
+	// CORS 설정: 모든 Originからのアクセスを許可 및 필수 헤더 포함
 	router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// 모든 Origin 허용
@@ -22,6 +22,7 @@ func main() {
 			// 허용할 HTTP 메서드 (OPTIONS 포함)
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
 			// 허용할 요청 헤더 (특히 "Content-Type"이 중요)
+			// "Content-Type"과 "X-Requested-With"는 웹 브라우저가 AJAX 요청 시 자동으로 추가하는 경우가 많습니다.
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With")
 			// 클라이언트가 자격 증명(쿠키, HTTP 인증)을 포함하여 요청을 보낼 수 있도록 허용 (필요시)
 			// w.Header().Set("Access-Control-Allow-Credentials", "true")
