@@ -14,7 +14,7 @@ func main() {
 
 	router := mux.NewRouter()
 
-	// CORS 설정: 모든 Originからのアクセスを許可 및 필수 헤더 포함
+	// CORS 설정:
 	router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// 모든 Origin 허용
